@@ -16,6 +16,10 @@ describe("MobileHeader", () => {
   it("exposes backend logout from the mobile drawer", async () => {
     render(<MobileHeader />);
     fireEvent.click(screen.getByRole("button", { name: "Открыть меню" }));
+    expect(screen.getByRole("link", { name: "Дети" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Настройки" })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Специалисты" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Журнал действий" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Выйти" }));
     await waitFor(() => expect(logout).toHaveBeenCalledOnce());
     expect(clear).toHaveBeenCalledOnce();

@@ -28,7 +28,8 @@ export function LoginForm() {
     try {
       const user = await authAPI.login(values.email, values.password);
       queryClient.setQueryData(["me"], user);
-      router.replace("/students");
+      const canViewStudents = user.permissions.includes("students.list") || user.permissions.includes("students.view");
+      router.replace(canViewStudents ? "/students" : "/settings");
     } catch (error) {
       if (error instanceof APIError && error.status === 429) setError("root", { message: "Слишком много попыток. Попробуйте позднее" });
       else if (error instanceof APIError && error.status === 0) setError("root", { message: "Сервер временно недоступен" });

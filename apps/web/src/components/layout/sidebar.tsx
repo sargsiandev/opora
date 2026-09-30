@@ -12,7 +12,7 @@ import { authAPI } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
 const navigation = [
-  { href: "/students", label: "Дети", icon: UsersRound, permissions: ["students.list"] },
+  { href: "/students", label: "Дети", icon: UsersRound, permissions: ["students.list", "students.view"] },
   { href: "/users", label: "Специалисты", icon: UserRoundCog, permissions: ["users.view", "users.create", "users.invite", "users.manage"] },
   { href: "/audit", label: "Журнал действий", icon: ClipboardList, permissions: ["audit.view"] },
   { href: "/settings", label: "Настройки", icon: Settings, permissions: [] },
@@ -40,6 +40,12 @@ export function MobileHeader() {
     document.addEventListener("keydown", close);
     return () => document.removeEventListener("keydown", close);
   }, []);
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [open]);
   return <><header className="mobile-header"><Logo /><button type="button" className="mobile-menu-button" onClick={() => setOpen(true)} aria-label="Открыть меню" aria-expanded={open}><Menu size={22} /></button></header>{open && <div className="mobile-drawer-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false); }}><aside className="mobile-drawer" role="dialog" aria-modal="true" aria-label="Навигация"><header><Logo /><button type="button" className="icon-button" autoFocus onClick={() => setOpen(false)} aria-label="Закрыть меню"><X size={21} /></button></header><Navigation pathname={pathname} permissions={user.permissions} onNavigate={() => setOpen(false)} /><Account /></aside></div>}</>;
 }
 

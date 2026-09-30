@@ -17,6 +17,7 @@ export default function StudentsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [toast, setToast] = useState("");
   const canCreate = user.permissions.includes("students.create");
+  const managesStudents = user.permissions.includes("access.manage") || user.permissions.includes("users.manage");
   const created = () => {
     setDialogOpen(false);
     setToast("Карточка ребёнка создана");
@@ -27,13 +28,13 @@ export default function StudentsPage() {
     <>
     <section>
       <header className="page-header">
-        <div><span className="eyebrow">Сопровождение</span><h1>Дети</h1><p>Карточки учащихся и связанные документы.</p></div>
+        <div><span className="eyebrow">Сопровождение</span><h1>Дети</h1><p>{managesStudents ? "Карточки учащихся и связанные документы." : "Учащиеся, доступные вам для сопровождения."}</p></div>
         {canCreate && <Button type="button" onClick={() => setDialogOpen(true)}><UserPlus size={18} />Добавить ребёнка</Button>}
       </header>
       {students.isPending && <div className="data-panel page-loading"><span className="loading-spinner" /> Загружаем карточки…</div>}
       {students.isError && <div className="data-panel empty-state"><strong>Не удалось загрузить список</strong><button type="button" onClick={() => void students.refetch()}>Повторить</button></div>}
       {students.data && students.data.length > 0 && <StudentsTable students={students.data} />}
-      {students.data?.length === 0 && <div className="data-panel empty-state"><UsersRound size={30} /><strong>В системе пока нет детей</strong><span>Создайте первую карточку для начала работы.</span>{canCreate && <Button type="button" onClick={() => setDialogOpen(true)}><UserPlus size={17} />Добавить ребёнка</Button>}</div>}
+      {students.data?.length === 0 && <div className="data-panel empty-state"><UsersRound size={30} /><strong>{canCreate ? "В системе пока нет детей" : "Нет назначенных учащихся"}</strong><span>{canCreate ? "Создайте первую карточку для начала работы." : "Доступные вам учащиеся появятся здесь после назначения."}</span>{canCreate && <Button type="button" onClick={() => setDialogOpen(true)}><UserPlus size={17} />Добавить ребёнка</Button>}</div>}
     </section>
     {dialogOpen && <CreateStudentDialog onClose={() => setDialogOpen(false)} onCreated={created} />}
     {toast && <div className="toast" role="status">{toast}</div>}
