@@ -4,12 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { UserPlus, X } from "lucide-react";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { APIError } from "@/lib/api/client";
 import { usersAPI, type OrganizationUser } from "@/lib/api/users";
+import { RolePermissions } from "@/features/users/role-permissions";
 
 const schema = z.object({
   lastName: z.string().trim().min(1, "Укажите фамилию").max(100),
@@ -27,6 +28,8 @@ export function CreateUserDialog({ onClose, onCreated }: { onClose: () => void; 
     defaultValues: { lastName: "", firstName: "", middleName: "", email: "", roleKey: "" },
   });
   const create = useMutation({ mutationFn: usersAPI.create, onSuccess: onCreated });
+  const roleKey = useWatch({ control: form.control, name: "roleKey" });
+  const selectedRole = roles.data?.find((role) => role.key === roleKey);
   useEffect(() => {
     const close = (event: KeyboardEvent) => { if (event.key === "Escape" && !create.isPending) onClose(); };
     document.addEventListener("keydown", close);
@@ -52,6 +55,7 @@ export function CreateUserDialog({ onClose, onCreated }: { onClose: () => void; 
             <label className="form-grid-wide"><span>Роль <b>*</b></span><select {...form.register("roleKey")} aria-invalid={Boolean(form.formState.errors.roleKey)} disabled={roles.isPending}><option value="">Выберите роль</option>{roles.data?.map((role) => <option key={role.id} value={role.key}>{role.name}</option>)}</select>{form.formState.errors.roleKey && <small role="alert">{form.formState.errors.roleKey.message}</small>}</label>
           </div>
           {roles.isError && <div className="form-error" role="alert">Не удалось загрузить роли</div>}
+          {selectedRole && <RolePermissions permissions={selectedRole.permissions ?? []} />}
           {create.isError && <div className="form-error" role="alert">{errorMessage}</div>}
           <p className="form-hint">Специалист получит одноразовую ссылку и самостоятельно задаст пароль. Ссылка действует 48 часов.</p>
           <footer><Button type="button" variant="ghost" onClick={onClose} disabled={create.isPending}>Отмена</Button><Button type="submit" disabled={create.isPending || roles.isPending}>{create.isPending ? "Создаём…" : "Создать пользователя"}</Button></footer>

@@ -33,6 +33,7 @@ function renderWorkspace() {
 describe("StudentWorkspace", () => {
   it("loads real documents, opens history and switches to access grants", async () => {
     renderWorkspace();
+    fireEvent.click(screen.getByRole("tab", { name: /Документы/ }));
     expect(await screen.findByText("Заключение")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "История" }));
     expect(await screen.findByRole("dialog", { name: "Заключение" })).toBeInTheDocument();

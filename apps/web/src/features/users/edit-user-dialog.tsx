@@ -4,12 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { PencilLine, X } from "lucide-react";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { APIError } from "@/lib/api/client";
 import { usersAPI, type OrganizationUser } from "@/lib/api/users";
+import { RolePermissions } from "@/features/users/role-permissions";
 
 const schema = z.object({
   lastName: z.string().trim().min(1, "Укажите фамилию").max(100),
@@ -26,6 +27,8 @@ export function EditUserDialog({ user, onClose, onUpdated }: { user: Organizatio
     lastName: user.lastName, firstName: user.firstName, middleName: user.middleName ?? "", email: user.email, roleKey: user.roleKey,
   } });
   const update = useMutation({ mutationFn: (values: FormValues) => usersAPI.update(user.id, values), onSuccess: onUpdated });
+  const roleKey = useWatch({ control: form.control, name: "roleKey" });
+  const selectedRole = roles.data?.find((role) => role.key === roleKey);
   useEffect(() => {
     const close = (event: KeyboardEvent) => { if (event.key === "Escape" && !update.isPending) onClose(); };
     document.addEventListener("keydown", close);
@@ -49,6 +52,7 @@ export function EditUserDialog({ user, onClose, onUpdated }: { user: Organizatio
           <label className="form-grid-wide"><span>Роль <b>*</b></span><select {...form.register("roleKey")} disabled={roles.isPending} aria-invalid={Boolean(form.formState.errors.roleKey)}>{roles.data?.map((role) => <option key={role.id} value={role.key}>{role.name}</option>)}</select>{form.formState.errors.roleKey && <small>{form.formState.errors.roleKey.message}</small>}</label>
         </div>
         {roles.isError && <div className="form-error" role="alert">Не удалось загрузить роли</div>}
+        {selectedRole && <RolePermissions permissions={selectedRole.permissions ?? []} />}
         {update.isError && <div className="form-error" role="alert">{error}</div>}
         <footer><Button type="button" variant="ghost" onClick={onClose} disabled={update.isPending}>Отмена</Button><Button type="submit" disabled={update.isPending || roles.isPending}>{update.isPending ? "Сохраняем…" : "Сохранить"}</Button></footer>
       </form>

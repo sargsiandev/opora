@@ -23,6 +23,29 @@ type AuditEvent struct {
 	Metadata       []byte             `json:"metadata"`
 }
 
+type CouncilMeeting struct {
+	ID              pgtype.UUID        `json:"id"`
+	OrganizationID  pgtype.UUID        `json:"organization_id"`
+	StudentID       pgtype.UUID        `json:"student_id"`
+	ScheduledAt     pgtype.Timestamptz `json:"scheduled_at"`
+	Status          string             `json:"status"`
+	Subject         string             `json:"subject"`
+	Questions       pgtype.Text        `json:"questions"`
+	Notes           pgtype.Text        `json:"notes"`
+	Decision        pgtype.Text        `json:"decision"`
+	Recommendations pgtype.Text        `json:"recommendations"`
+	CreatedBy       pgtype.UUID        `json:"created_by"`
+	CompletedAt     pgtype.Timestamptz `json:"completed_at"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+}
+
+type CouncilMeetingParticipant struct {
+	OrganizationID pgtype.UUID `json:"organization_id"`
+	MeetingID      pgtype.UUID `json:"meeting_id"`
+	UserID         pgtype.UUID `json:"user_id"`
+}
+
 type Document struct {
 	ID                   pgtype.UUID        `json:"id"`
 	OrganizationID       pgtype.UUID        `json:"organization_id"`
@@ -49,6 +72,18 @@ type DocumentVersion struct {
 	CreatedBy        pgtype.UUID        `json:"created_by"`
 	CreatedAt        pgtype.Timestamptz `json:"created_at"`
 	SourceVersionID  pgtype.UUID        `json:"source_version_id"`
+}
+
+type GoalProgressEntry struct {
+	ID             pgtype.UUID        `json:"id"`
+	OrganizationID pgtype.UUID        `json:"organization_id"`
+	StudentID      pgtype.UUID        `json:"student_id"`
+	GoalID         pgtype.UUID        `json:"goal_id"`
+	Body           string             `json:"body"`
+	ProgressStatus pgtype.Text        `json:"progress_status"`
+	ObservedAt     pgtype.Date        `json:"observed_at"`
+	CreatedBy      pgtype.UUID        `json:"created_by"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
 }
 
 type Membership struct {
@@ -119,6 +154,63 @@ type StudentAccessGrant struct {
 	UserID         pgtype.UUID        `json:"user_id"`
 	GrantCode      string             `json:"grant_code"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+}
+
+type StudentNote struct {
+	ID             pgtype.UUID        `json:"id"`
+	OrganizationID pgtype.UUID        `json:"organization_id"`
+	StudentID      pgtype.UUID        `json:"student_id"`
+	AuthorUserID   pgtype.UUID        `json:"author_user_id"`
+	NoteType       string             `json:"note_type"`
+	Body           string             `json:"body"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+}
+
+type SupportCase struct {
+	ID                pgtype.UUID        `json:"id"`
+	OrganizationID    pgtype.UUID        `json:"organization_id"`
+	StudentID         pgtype.UUID        `json:"student_id"`
+	Title             string             `json:"title"`
+	Reason            pgtype.Text        `json:"reason"`
+	Status            string             `json:"status"`
+	Priority          string             `json:"priority"`
+	ResponsibleUserID pgtype.UUID        `json:"responsible_user_id"`
+	OpenedAt          pgtype.Date        `json:"opened_at"`
+	ClosedAt          pgtype.Date        `json:"closed_at"`
+	CreatedBy         pgtype.UUID        `json:"created_by"`
+	CreatedAt         pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt         pgtype.Timestamptz `json:"updated_at"`
+}
+
+type SupportGoal struct {
+	ID             pgtype.UUID        `json:"id"`
+	OrganizationID pgtype.UUID        `json:"organization_id"`
+	StudentID      pgtype.UUID        `json:"student_id"`
+	SupportCaseID  pgtype.UUID        `json:"support_case_id"`
+	Title          string             `json:"title"`
+	Description    pgtype.Text        `json:"description"`
+	TargetDate     pgtype.Date        `json:"target_date"`
+	Status         string             `json:"status"`
+	CreatedBy      pgtype.UUID        `json:"created_by"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Task struct {
+	ID             pgtype.UUID        `json:"id"`
+	OrganizationID pgtype.UUID        `json:"organization_id"`
+	StudentID      pgtype.UUID        `json:"student_id"`
+	MeetingID      pgtype.UUID        `json:"meeting_id"`
+	Title          string             `json:"title"`
+	Description    pgtype.Text        `json:"description"`
+	AssigneeUserID pgtype.UUID        `json:"assignee_user_id"`
+	DueAt          pgtype.Timestamptz `json:"due_at"`
+	Status         string             `json:"status"`
+	CreatedBy      pgtype.UUID        `json:"created_by"`
+	CompletedAt    pgtype.Timestamptz `json:"completed_at"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }
 
 type User struct {

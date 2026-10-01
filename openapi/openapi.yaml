@@ -14,6 +14,10 @@ tags:
   - name: Access
   - name: Audit
   - name: Organization
+  - name: Dashboard
+  - name: Casework
+  - name: Meetings
+  - name: Tasks
 paths:
   /health/live:
     get:
@@ -420,6 +424,170 @@ paths:
                   config: { type: object, additionalProperties: true }
         "403": { $ref: "#/components/responses/Error" }
         "415": { $ref: "#/components/responses/Error" }
+  /api/v1/dashboard:
+    get:
+      operationId: getDashboard
+      tags: [Dashboard]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Tenant-scoped daily workspace, content: { application/json: { schema: { $ref: "#/components/schemas/Dashboard" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/students/{studentId}/notes:
+    parameters: [{ $ref: "#/components/parameters/StudentID" }]
+    get:
+      operationId: listStudentNotes
+      tags: [Casework]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Visible student notes, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/StudentNote" } } } } } } }
+        "403": { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createStudentNote
+      tags: [Casework]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateStudentNote" } } } }
+      responses:
+        "201": { description: Note created, content: { application/json: { schema: { $ref: "#/components/schemas/StudentNote" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/students/{studentId}/support-cases:
+    parameters: [{ $ref: "#/components/parameters/StudentID" }]
+    get:
+      operationId: listStudentSupportCases
+      tags: [Casework]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Student support cases with goals and progress, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/SupportCase" } } } } } } }
+        "403": { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createStudentSupportCase
+      tags: [Casework]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateSupportCase" } } } }
+      responses:
+        "201": { description: Support case created, content: { application/json: { schema: { $ref: "#/components/schemas/SupportCase" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/support-cases/{caseId}/goals:
+    post:
+      operationId: createSupportGoal
+      tags: [Casework]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      parameters: [{ name: caseId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateSupportGoal" } } } }
+      responses:
+        "201": { description: Goal created, content: { application/json: { schema: { $ref: "#/components/schemas/SupportGoal" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/support-cases/{caseId}:
+    patch:
+      operationId: updateSupportCaseStatus
+      tags: [Casework]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      parameters: [{ name: caseId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [status], properties: { status: { type: string, enum: [active, monitoring, completed] } } } } } }
+      responses:
+        "200": { description: Support case status updated, content: { application/json: { schema: { $ref: "#/components/schemas/SupportCase" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/support-goals/{goalId}:
+    patch:
+      operationId: updateSupportGoalStatus
+      tags: [Casework]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      parameters: [{ name: goalId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, additionalProperties: false, required: [status], properties: { status: { type: string, enum: [planned, in_progress, achieved, cancelled] } } } } } }
+      responses:
+        "200": { description: Support goal status updated, content: { application/json: { schema: { $ref: "#/components/schemas/SupportGoal" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/support-goals/{goalId}/progress:
+    post:
+      operationId: createGoalProgress
+      tags: [Casework]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      parameters: [{ name: goalId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateGoalProgress" } } } }
+      responses:
+        "201": { description: Progress entry created, content: { application/json: { schema: { $ref: "#/components/schemas/GoalProgress" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/meetings:
+    get:
+      operationId: listMeetings
+      tags: [Meetings]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Meetings for visible students, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/CouncilMeeting" } } } } } } }
+  /api/v1/students/{studentId}/meetings:
+    parameters: [{ $ref: "#/components/parameters/StudentID" }]
+    get:
+      operationId: listStudentMeetings
+      tags: [Meetings]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Student meetings, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/CouncilMeeting" } } } } } } }
+    post:
+      operationId: createStudentMeeting
+      tags: [Meetings]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateCouncilMeeting" } } } }
+      responses:
+        "201": { description: Meeting created, content: { application/json: { schema: { $ref: "#/components/schemas/CouncilMeeting" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/meetings/{meetingId}:
+    parameters: [{ name: meetingId, in: path, required: true, schema: { type: string, format: uuid } }]
+    get:
+      operationId: getMeeting
+      tags: [Meetings]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Tenant-scoped meeting, content: { application/json: { schema: { $ref: "#/components/schemas/CouncilMeeting" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+    patch:
+      operationId: updateMeeting
+      tags: [Meetings]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/UpdateCouncilMeeting" } } } }
+      responses:
+        "200": { description: Meeting updated or completed, content: { application/json: { schema: { $ref: "#/components/schemas/CouncilMeeting" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/tasks:
+    get:
+      operationId: listMyTasks
+      tags: [Tasks]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Tasks assigned to current user, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/StudentTask" } } } } } } }
+  /api/v1/students/{studentId}/tasks:
+    parameters: [{ $ref: "#/components/parameters/StudentID" }]
+    get:
+      operationId: listStudentTasks
+      tags: [Tasks]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Student tasks, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/StudentTask" } } } } } } }
+    post:
+      operationId: createStudentTask
+      tags: [Tasks]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      requestBody: { required: true, content: { application/json: { schema: { $ref: "#/components/schemas/CreateStudentTask" } } } }
+      responses:
+        "201": { description: Task created, content: { application/json: { schema: { $ref: "#/components/schemas/StudentTask" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/tasks/{taskId}:
+    patch:
+      operationId: updateTaskStatus
+      tags: [Tasks]
+      security: [{ sessionCookie: [], csrfHeader: [] }]
+      parameters: [{ name: taskId, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody: { required: true, content: { application/json: { schema: { type: object, required: [status], properties: { status: { type: string, enum: [todo, done] } } } } } }
+      responses:
+        "200": { description: Task status updated, content: { application/json: { schema: { $ref: "#/components/schemas/StudentTask" } } } }
+        "403": { $ref: "#/components/responses/Error" }
+  /api/v1/students/{studentId}/timeline:
+    parameters: [{ $ref: "#/components/parameters/StudentID" }]
+    get:
+      operationId: getStudentTimeline
+      tags: [Casework]
+      security: [{ sessionCookie: [] }]
+      responses:
+        "200": { description: Unified student activity timeline, content: { application/json: { schema: { type: object, properties: { items: { type: array, items: { $ref: "#/components/schemas/TimelineEntry" } } } } } } }
+        "403": { $ref: "#/components/responses/Error" }
 components:
   securitySchemes:
     sessionCookie: { type: apiKey, in: cookie, name: opora_session }
@@ -496,7 +664,7 @@ components:
         className: { type: [string, "null"], maxLength: 32 }
     Student:
       type: object
-      required: [id, lastName, firstName, documentCount, createdAt, updatedAt]
+      required: [id, lastName, firstName, documentCount, specialists, activeSupport, createdAt, updatedAt]
       properties:
         id: { type: string, format: uuid }
         lastName: { type: string }
@@ -505,18 +673,19 @@ components:
         birthDate: { type: [string, "null"], format: date }
         className: { type: [string, "null"] }
         documentCount: { type: integer, format: int64 }
+        specialists: { type: array, items: { type: string } }
+        activeSupport: { type: boolean }
         createdAt: { type: string, format: date-time }
-        invitationCreatedAt: { type: [string, "null"], format: date-time }
-        invitationAcceptedAt: { type: [string, "null"], format: date-time }
         updatedAt: { type: string, format: date-time }
     Role:
       type: object
-      required: [id, key, name, isSystem]
+      required: [id, key, name, isSystem, permissions]
       properties:
         id: { type: string, format: uuid }
         key: { type: string }
         name: { type: string }
         isSystem: { type: boolean }
+        permissions: { type: array, items: { type: string } }
     CreateUser:
       type: object
       additionalProperties: false
@@ -602,6 +771,194 @@ components:
         size: { type: integer, format: int64, minimum: 1 }
         sha256: { type: string, pattern: "^[0-9a-f]{64}$" }
         changedBy: { type: string }
+        createdAt: { type: string, format: date-time }
+    Dashboard:
+      type: object
+      required: [studentCount, upcomingMeetings, tasksToday, overdueTasks]
+      properties:
+        studentCount: { type: integer, format: int64 }
+        upcomingMeetings: { type: integer, format: int64 }
+        tasksToday: { type: integer, format: int64 }
+        overdueTasks: { type: integer, format: int64 }
+        attention: { type: [array, "null"], items: { $ref: "#/components/schemas/DashboardItem" } }
+        upcoming: { type: [array, "null"], items: { $ref: "#/components/schemas/DashboardItem" } }
+        recentStudents: { type: [array, "null"], items: { $ref: "#/components/schemas/RecentStudent" } }
+    DashboardItem:
+      type: object
+      required: [id, kind, title, occurredAt]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [task, meeting] }
+        title: { type: string }
+        studentId: { type: [string, "null"], format: uuid }
+        studentName: { type: [string, "null"] }
+        occurredAt: { type: string, format: date-time }
+    RecentStudent:
+      type: object
+      required: [id, fullName, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        fullName: { type: string }
+        className: { type: [string, "null"] }
+        updatedAt: { type: string, format: date-time }
+    StudentNote:
+      type: object
+      required: [id, studentId, authorUserId, authorName, type, body, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        studentId: { type: string, format: uuid }
+        authorUserId: { type: string, format: uuid }
+        authorName: { type: string }
+        type: { type: string, enum: [observation, meeting, contact, other] }
+        body: { type: string, maxLength: 5000 }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CreateStudentNote:
+      type: object
+      additionalProperties: false
+      required: [type, body]
+      properties:
+        type: { type: string, enum: [observation, meeting, contact, other] }
+        body: { type: string, minLength: 1, maxLength: 5000 }
+    SupportCase:
+      type: object
+      required: [id, studentId, title, status, priority, openedAt, goals, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        studentId: { type: string, format: uuid }
+        title: { type: string }
+        reason: { type: [string, "null"] }
+        status: { type: string, enum: [active, monitoring, completed] }
+        priority: { type: string, enum: [low, normal, high] }
+        responsibleUserId: { type: [string, "null"], format: uuid }
+        responsibleName: { type: [string, "null"] }
+        openedAt: { type: string, format: date }
+        closedAt: { type: [string, "null"], format: date }
+        goals: { type: array, items: { $ref: "#/components/schemas/SupportGoal" } }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CreateSupportCase:
+      type: object
+      additionalProperties: false
+      required: [title, priority]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 255 }
+        reason: { type: string, maxLength: 3000 }
+        priority: { type: string, enum: [low, normal, high] }
+        responsibleUserId: { type: [string, "null"], format: uuid }
+    SupportGoal:
+      type: object
+      required: [id, supportCaseId, title, status, progress, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        supportCaseId: { type: string, format: uuid }
+        title: { type: string }
+        description: { type: [string, "null"] }
+        targetDate: { type: [string, "null"], format: date }
+        status: { type: string, enum: [planned, in_progress, achieved, cancelled] }
+        progress: { type: array, items: { $ref: "#/components/schemas/GoalProgress" } }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CreateSupportGoal:
+      type: object
+      additionalProperties: false
+      required: [title]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 255 }
+        description: { type: string, maxLength: 3000 }
+        targetDate: { type: string, format: date }
+    GoalProgress:
+      type: object
+      required: [id, goalId, authorName, body, observedAt, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        goalId: { type: string, format: uuid }
+        authorName: { type: string }
+        body: { type: string }
+        progressStatus: { type: [string, "null"], enum: [on_track, needs_attention, achieved, null] }
+        observedAt: { type: string, format: date }
+        createdAt: { type: string, format: date-time }
+    CreateGoalProgress:
+      type: object
+      additionalProperties: false
+      required: [body]
+      properties:
+        body: { type: string, minLength: 1, maxLength: 3000 }
+        progressStatus: { type: string, enum: [on_track, needs_attention, achieved] }
+        observedAt: { type: string, format: date }
+    CouncilMeeting:
+      type: object
+      required: [id, studentId, studentName, scheduledAt, status, subject, participantIds, participantNames, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        studentId: { type: string, format: uuid }
+        studentName: { type: string }
+        scheduledAt: { type: string, format: date-time }
+        status: { type: string, enum: [planned, completed, cancelled] }
+        subject: { type: string }
+        questions: { type: [string, "null"] }
+        notes: { type: [string, "null"] }
+        decision: { type: [string, "null"] }
+        recommendations: { type: [string, "null"] }
+        participantIds: { type: array, items: { type: string, format: uuid } }
+        participantNames: { type: array, items: { type: string } }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CreateCouncilMeeting:
+      type: object
+      additionalProperties: false
+      required: [scheduledAt, subject]
+      properties:
+        scheduledAt: { type: string, format: date-time }
+        subject: { type: string, minLength: 1, maxLength: 500 }
+        questions: { type: string, maxLength: 5000 }
+        notes: { type: string, maxLength: 5000 }
+        participantIds: { type: array, uniqueItems: true, items: { type: string, format: uuid } }
+    UpdateCouncilMeeting:
+      allOf:
+        - $ref: "#/components/schemas/CreateCouncilMeeting"
+        - type: object
+          required: [status, decision, recommendations]
+          properties:
+            status: { type: string, enum: [planned, completed, cancelled] }
+            decision: { type: string, maxLength: 5000 }
+            recommendations: { type: string, maxLength: 5000 }
+    StudentTask:
+      type: object
+      required: [id, title, assigneeUserId, assigneeName, status, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid }
+        studentId: { type: [string, "null"], format: uuid }
+        studentName: { type: [string, "null"] }
+        meetingId: { type: [string, "null"], format: uuid }
+        title: { type: string }
+        description: { type: [string, "null"] }
+        assigneeUserId: { type: string, format: uuid }
+        assigneeName: { type: string }
+        dueAt: { type: [string, "null"], format: date-time }
+        status: { type: string, enum: [todo, done] }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    CreateStudentTask:
+      type: object
+      additionalProperties: false
+      required: [title, assigneeUserId]
+      properties:
+        title: { type: string, minLength: 1, maxLength: 255 }
+        description: { type: string, maxLength: 3000 }
+        assigneeUserId: { type: string, format: uuid }
+        dueAt: { type: string, format: date-time }
+        meetingId: { type: [string, "null"], format: uuid }
+    TimelineEntry:
+      type: object
+      required: [id, action, actorName, resourceType, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        action: { type: string }
+        actorName: { type: string }
+        resourceType: { type: string }
+        resourceId: { type: [string, "null"], format: uuid }
+        title: { type: [string, "null"] }
         createdAt: { type: string, format: date-time }
     ErrorResponse:
       type: object

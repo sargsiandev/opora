@@ -27,6 +27,8 @@ type Student struct {
 	BirthDate     *time.Time `json:"birthDate"`
 	ClassName     *string    `json:"className"`
 	DocumentCount int64      `json:"documentCount"`
+	Specialists   []string   `json:"specialists"`
+	ActiveSupport bool       `json:"activeSupport"`
 	CreatedAt     time.Time  `json:"createdAt"`
 	UpdatedAt     time.Time  `json:"updatedAt"`
 }
@@ -46,7 +48,15 @@ func NewRepository(pool *pgxpool.Pool) *Repository { return &Repository{pool: po
 func (r *Repository) List(ctx context.Context, actor access.Actor) ([]Student, error) {
 	rows, err := r.pool.Query(ctx, `
 		SELECT s.id,s.last_name,s.first_name,s.middle_name,s.birth_date,s.class_name,
-		       count(d.id),s.created_at,GREATEST(s.updated_at,COALESCE(max(d.updated_at),s.updated_at))
+		       count(d.id),
+		       COALESCE((SELECT array_agg(DISTINCT u.display_name ORDER BY u.display_name) FROM student_access_grants g
+		         JOIN users u ON u.id=g.user_id WHERE g.organization_id=s.organization_id AND g.student_id=s.id),'{}'),
+		       EXISTS(SELECT 1 FROM support_cases c WHERE c.organization_id=s.organization_id AND c.student_id=s.id AND c.status<>'completed'),
+		       s.created_at,GREATEST(s.updated_at,COALESCE(max(d.updated_at),s.updated_at),
+		         COALESCE((SELECT max(n.updated_at) FROM student_notes n WHERE n.organization_id=s.organization_id AND n.student_id=s.id),s.updated_at),
+		         COALESCE((SELECT max(c.updated_at) FROM support_cases c WHERE c.organization_id=s.organization_id AND c.student_id=s.id),s.updated_at),
+		         COALESCE((SELECT max(m.updated_at) FROM council_meetings m WHERE m.organization_id=s.organization_id AND m.student_id=s.id),s.updated_at),
+		         COALESCE((SELECT max(t.updated_at) FROM tasks t WHERE t.organization_id=s.organization_id AND t.student_id=s.id),s.updated_at))
 		FROM students s LEFT JOIN documents d ON d.organization_id=s.organization_id AND d.student_id=s.id
 		WHERE s.organization_id=$1 AND ($2 OR EXISTS (
 			SELECT 1 FROM student_access_grants g WHERE g.organization_id=s.organization_id
@@ -59,7 +69,7 @@ func (r *Repository) List(ctx context.Context, actor access.Actor) ([]Student, e
 	result := make([]Student, 0)
 	for rows.Next() {
 		var s Student
-		if err := rows.Scan(&s.ID, &s.LastName, &s.FirstName, &s.MiddleName, &s.BirthDate, &s.ClassName, &s.DocumentCount, &s.CreatedAt, &s.UpdatedAt); err != nil {
+		if err := rows.Scan(&s.ID, &s.LastName, &s.FirstName, &s.MiddleName, &s.BirthDate, &s.ClassName, &s.DocumentCount, &s.Specialists, &s.ActiveSupport, &s.CreatedAt, &s.UpdatedAt); err != nil {
 			return nil, err
 		}
 		result = append(result, s)
@@ -70,10 +80,16 @@ func (r *Repository) List(ctx context.Context, actor access.Actor) ([]Student, e
 func (r *Repository) Get(ctx context.Context, organizationID, id uuid.UUID) (Student, error) {
 	var s Student
 	err := r.pool.QueryRow(ctx, `SELECT s.id,s.last_name,s.first_name,s.middle_name,s.birth_date,s.class_name,
-		count(d.id),s.created_at,GREATEST(s.updated_at,COALESCE(max(d.updated_at),s.updated_at))
+		count(d.id),COALESCE((SELECT array_agg(DISTINCT u.display_name ORDER BY u.display_name) FROM student_access_grants g JOIN users u ON u.id=g.user_id WHERE g.organization_id=s.organization_id AND g.student_id=s.id),'{}'),
+		EXISTS(SELECT 1 FROM support_cases c WHERE c.organization_id=s.organization_id AND c.student_id=s.id AND c.status<>'completed'),
+		s.created_at,GREATEST(s.updated_at,COALESCE(max(d.updated_at),s.updated_at),
+		COALESCE((SELECT max(n.updated_at) FROM student_notes n WHERE n.organization_id=s.organization_id AND n.student_id=s.id),s.updated_at),
+		COALESCE((SELECT max(c.updated_at) FROM support_cases c WHERE c.organization_id=s.organization_id AND c.student_id=s.id),s.updated_at),
+		COALESCE((SELECT max(m.updated_at) FROM council_meetings m WHERE m.organization_id=s.organization_id AND m.student_id=s.id),s.updated_at),
+		COALESCE((SELECT max(t.updated_at) FROM tasks t WHERE t.organization_id=s.organization_id AND t.student_id=s.id),s.updated_at))
 		FROM students s LEFT JOIN documents d ON d.organization_id=s.organization_id AND d.student_id=s.id
 		WHERE s.organization_id=$1 AND s.id=$2 GROUP BY s.id`, organizationID, id).Scan(
-		&s.ID, &s.LastName, &s.FirstName, &s.MiddleName, &s.BirthDate, &s.ClassName, &s.DocumentCount, &s.CreatedAt, &s.UpdatedAt)
+		&s.ID, &s.LastName, &s.FirstName, &s.MiddleName, &s.BirthDate, &s.ClassName, &s.DocumentCount, &s.Specialists, &s.ActiveSupport, &s.CreatedAt, &s.UpdatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return Student{}, ErrNotFound
 	}

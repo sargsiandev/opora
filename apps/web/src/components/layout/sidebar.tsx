@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ClipboardList, LogOut, Menu, Settings, UserRoundCog, UsersRound, X } from "lucide-react";
+import { CalendarCheck2, ClipboardList, Files, LayoutDashboard, ListTodo, LogOut, Menu, Settings, UserRoundCog, UsersRound, X } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
@@ -12,7 +12,11 @@ import { authAPI } from "@/lib/api/client";
 import { cn } from "@/lib/cn";
 
 const navigation = [
+  { href: "/overview", label: "Обзор", icon: LayoutDashboard, permissions: ["students.list", "students.view"] },
   { href: "/students", label: "Дети", icon: UsersRound, permissions: ["students.list", "students.view"] },
+  { href: "/meetings", label: "ППк", icon: CalendarCheck2, permissions: ["students.list", "students.view"] },
+  { href: "/tasks", label: "Задачи", icon: ListTodo, permissions: ["students.list", "students.view"] },
+  { href: "/documents", label: "Документы", icon: Files, permissions: ["documents.list", "documents.view"] },
   { href: "/users", label: "Специалисты", icon: UserRoundCog, permissions: ["users.view", "users.create", "users.invite", "users.manage"] },
   { href: "/audit", label: "Журнал действий", icon: ClipboardList, permissions: ["audit.view"] },
   { href: "/settings", label: "Настройки", icon: Settings, permissions: [] },
@@ -24,7 +28,7 @@ export function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div className="brand-mark"><Logo /></div>
+      <div className="brand-mark"><Logo /></div><span className="nav-section-label">Рабочее пространство</span>
       <Navigation pathname={pathname} permissions={user.permissions} />
       <Account compact />
     </aside>

@@ -3,14 +3,16 @@ import type { Student, StudentSummary } from "@/lib/data/types";
 
 type APIStudent = {
   id: string; lastName: string; firstName: string; middleName: string | null; birthDate: string | null;
-  className: string | null; documentCount: number; createdAt: string; updatedAt: string;
+  className: string | null; documentCount: number; specialists?: string[]; activeSupport?: boolean; createdAt: string; updatedAt: string;
 };
 
 const fullName = (student: APIStudent) => [student.lastName, student.firstName, student.middleName].filter(Boolean).join(" ");
 const dateTime = (value: string) => new Intl.DateTimeFormat("ru-RU", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 const mapSummary = (student: APIStudent): StudentSummary => ({
   id: student.id, fullName: fullName(student), className: student.className ?? "—",
-  documentCount: student.documentCount, updatedAt: dateTime(student.updatedAt),
+  documentCount: student.documentCount, updatedAt: dateTime(student.updatedAt), updatedAtValue: student.updatedAt,
+  birthDateValue: student.birthDate ?? undefined,
+  specialists: student.specialists ?? [], activeSupport: student.activeSupport ?? false,
 });
 
 export const studentsAPI = {

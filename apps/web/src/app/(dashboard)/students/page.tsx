@@ -5,6 +5,7 @@ import { UsersRound, UserPlus } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { useCurrentUser } from "@/features/auth/auth-boundary";
 import { CreateStudentDialog } from "@/features/students/create-student-dialog";
 import { StudentsTable } from "@/features/students/students-table";
@@ -27,10 +28,7 @@ export default function StudentsPage() {
   return (
     <>
     <section>
-      <header className="page-header">
-        <div><span className="eyebrow">Сопровождение</span><h1>Дети</h1><p>{managesStudents ? "Карточки учащихся и связанные документы." : "Учащиеся, доступные вам для сопровождения."}</p></div>
-        {canCreate && <Button type="button" onClick={() => setDialogOpen(true)}><UserPlus size={18} />Добавить ребёнка</Button>}
-      </header>
+      <PageHeader eyebrow="Сопровождение" title="Дети" description={managesStudents ? "Учащиеся, сопровождение которых ведёт ваша организация." : "Учащиеся, доступные вам для сопровождения."} actions={canCreate && <Button type="button" onClick={() => setDialogOpen(true)}><UserPlus size={18} />Добавить ребёнка</Button>} />
       {students.isPending && <div className="data-panel page-loading"><span className="loading-spinner" /> Загружаем карточки…</div>}
       {students.isError && <div className="data-panel empty-state"><strong>Не удалось загрузить список</strong><button type="button" onClick={() => void students.refetch()}>Повторить</button></div>}
       {students.data && students.data.length > 0 && <StudentsTable students={students.data} />}

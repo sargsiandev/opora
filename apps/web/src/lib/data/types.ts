@@ -35,6 +35,10 @@ export type StudentSummary = {
   className: string;
   documentCount: number;
   updatedAt: string;
+  updatedAtValue?: string;
+  birthDateValue?: string;
+  specialists?: string[];
+  activeSupport?: boolean;
 };
 
 export type Student = StudentSummary & {

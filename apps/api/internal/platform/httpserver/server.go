@@ -14,6 +14,7 @@ import (
 
 	"opora.local/api/internal/audit"
 	"opora.local/api/internal/auth"
+	"opora.local/api/internal/casework"
 	"opora.local/api/internal/config"
 	"opora.local/api/internal/document"
 	"opora.local/api/internal/organization"
@@ -38,6 +39,7 @@ type Application struct {
 	Access       *studentaccess.Handler
 	Audit        *audit.Handler
 	Organization *organization.Handler
+	Casework     *casework.Handler
 	WebOrigin    string
 }
 
@@ -103,6 +105,25 @@ func mountApplication(router chi.Router, app Application) {
 			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Patch("/students/{studentId}/access", app.Access.Set)
 			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Delete("/students/{studentId}/access/{userId}", app.Access.Delete)
 			protected.Get("/audit", app.Audit.List)
+			protected.Get("/dashboard", app.Casework.Dashboard)
+			protected.Get("/meetings", app.Casework.Meetings)
+			protected.Get("/meetings/{meetingId}", app.Casework.Meeting)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Patch("/meetings/{meetingId}", app.Casework.UpdateMeeting)
+			protected.Get("/tasks", app.Casework.Tasks)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Patch("/tasks/{taskId}", app.Casework.UpdateTask)
+			protected.Get("/students/{studentId}/notes", app.Casework.Notes)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Post("/students/{studentId}/notes", app.Casework.CreateNote)
+			protected.Get("/students/{studentId}/support-cases", app.Casework.Cases)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Post("/students/{studentId}/support-cases", app.Casework.CreateCase)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Patch("/support-cases/{caseId}", app.Casework.UpdateCase)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Post("/support-cases/{caseId}/goals", app.Casework.CreateGoal)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Patch("/support-goals/{goalId}", app.Casework.UpdateGoal)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Post("/support-goals/{goalId}/progress", app.Casework.CreateProgress)
+			protected.Get("/students/{studentId}/meetings", app.Casework.StudentMeetings)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Post("/students/{studentId}/meetings", app.Casework.CreateMeeting)
+			protected.Get("/students/{studentId}/tasks", app.Casework.StudentTasks)
+			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Post("/students/{studentId}/tasks", app.Casework.CreateTask)
+			protected.Get("/students/{studentId}/timeline", app.Casework.Timeline)
 			protected.Get("/students/{studentId}/documents", app.Documents.List)
 			protected.With(requireOrigin(app.WebOrigin), app.Auth.RequireCSRF).Post("/students/{studentId}/documents", app.Documents.Upload)
 			protected.Get("/documents/{documentId}", app.Documents.Get)

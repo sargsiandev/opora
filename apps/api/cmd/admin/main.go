@@ -142,7 +142,7 @@ func createFirstAdmin(ctx context.Context, pool databasePool, email, name, organ
 			('psychologist','students.list'),('psychologist','students.view'),('psychologist','students.create'),
 			('psychologist','students.update'),('psychologist','documents.list'),('psychologist','documents.view'),
 			('psychologist','documents.download'),('psychologist','documents.upload'),('psychologist','documents.edit'),
-			('specialist','students.list'),('specialist','students.view'),('specialist','students.create'),
+			('specialist','students.list'),('specialist','students.view'),('specialist','students.create'),('specialist','students.update'),
 			('specialist','documents.list'),('specialist','documents.view'),('specialist','documents.download'),
 			('specialist','documents.upload'),('specialist','documents.edit'),('viewer','students.list'),
 			('viewer','students.view'),('viewer','documents.list'),('viewer','documents.view'),('viewer','documents.download')

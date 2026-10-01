@@ -4,6 +4,7 @@ import "testing"
 
 func TestValidateNewPassword(t *testing.T) {
 	t.Parallel()
+	// #nosec G101 -- these are deliberately public validation fixtures, not credentials.
 	tests := []struct {
 		name     string
 		password string

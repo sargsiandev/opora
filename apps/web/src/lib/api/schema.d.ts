@@ -414,6 +414,242 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getDashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{studentId}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        get: operations["listStudentNotes"];
+        put?: never;
+        post: operations["createStudentNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{studentId}/support-cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        get: operations["listStudentSupportCases"];
+        put?: never;
+        post: operations["createStudentSupportCase"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support-cases/{caseId}/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createSupportGoal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/support-cases/{caseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateSupportCaseStatus"];
+        trace?: never;
+    };
+    "/api/v1/support-goals/{goalId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateSupportGoalStatus"];
+        trace?: never;
+    };
+    "/api/v1/support-goals/{goalId}/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createGoalProgress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/meetings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listMeetings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{studentId}/meetings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        get: operations["listStudentMeetings"];
+        put?: never;
+        post: operations["createStudentMeeting"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/meetings/{meetingId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meetingId: string;
+            };
+            cookie?: never;
+        };
+        get: operations["getMeeting"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateMeeting"];
+        trace?: never;
+    };
+    "/api/v1/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["listMyTasks"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/students/{studentId}/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        get: operations["listStudentTasks"];
+        put?: never;
+        post: operations["createStudentTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tasks/{taskId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateTaskStatus"];
+        trace?: never;
+    };
+    "/api/v1/students/{studentId}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        get: operations["getStudentTimeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -429,7 +665,10 @@ export interface components {
         };
         AcceptInvitation: {
             token: string;
-            /** Format: password */
+            /**
+             * Format: password
+             * @description Must contain at least one letter and one digit.
+             */
             password: string;
         };
         UpdateProfile: {
@@ -442,7 +681,10 @@ export interface components {
         ChangePassword: {
             /** Format: password */
             currentPassword: string;
-            /** Format: password */
+            /**
+             * Format: password
+             * @description Must contain at least one letter and one digit.
+             */
             newPassword: string;
         };
         CurrentUser: {
@@ -480,12 +722,10 @@ export interface components {
             className?: string | null;
             /** Format: int64 */
             documentCount: number;
+            specialists: string[];
+            activeSupport: boolean;
             /** Format: date-time */
             createdAt: string;
-            /** Format: date-time */
-            invitationCreatedAt?: string | null;
-            /** Format: date-time */
-            invitationAcceptedAt?: string | null;
             /** Format: date-time */
             updatedAt: string;
         };
@@ -495,6 +735,7 @@ export interface components {
             key: string;
             name: string;
             isSystem: boolean;
+            permissions: string[];
         };
         CreateUser: {
             lastName: string;
@@ -589,6 +830,216 @@ export interface components {
             size: number;
             sha256: string;
             changedBy: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        Dashboard: {
+            /** Format: int64 */
+            studentCount: number;
+            /** Format: int64 */
+            upcomingMeetings: number;
+            /** Format: int64 */
+            tasksToday: number;
+            /** Format: int64 */
+            overdueTasks: number;
+            attention?: components["schemas"]["DashboardItem"][] | null;
+            upcoming?: components["schemas"]["DashboardItem"][] | null;
+            recentStudents?: components["schemas"]["RecentStudent"][] | null;
+        };
+        DashboardItem: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "task" | "meeting";
+            title: string;
+            /** Format: uuid */
+            studentId?: string | null;
+            studentName?: string | null;
+            /** Format: date-time */
+            occurredAt: string;
+        };
+        RecentStudent: {
+            /** Format: uuid */
+            id: string;
+            fullName: string;
+            className?: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        StudentNote: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            studentId: string;
+            /** Format: uuid */
+            authorUserId: string;
+            authorName: string;
+            /** @enum {string} */
+            type: "observation" | "meeting" | "contact" | "other";
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateStudentNote: {
+            /** @enum {string} */
+            type: "observation" | "meeting" | "contact" | "other";
+            body: string;
+        };
+        SupportCase: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            studentId: string;
+            title: string;
+            reason?: string | null;
+            /** @enum {string} */
+            status: "active" | "monitoring" | "completed";
+            /** @enum {string} */
+            priority: "low" | "normal" | "high";
+            /** Format: uuid */
+            responsibleUserId?: string | null;
+            responsibleName?: string | null;
+            /** Format: date */
+            openedAt: string;
+            /** Format: date */
+            closedAt?: string | null;
+            goals: components["schemas"]["SupportGoal"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateSupportCase: {
+            title: string;
+            reason?: string;
+            /** @enum {string} */
+            priority: "low" | "normal" | "high";
+            /** Format: uuid */
+            responsibleUserId?: string | null;
+        };
+        SupportGoal: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            supportCaseId: string;
+            title: string;
+            description?: string | null;
+            /** Format: date */
+            targetDate?: string | null;
+            /** @enum {string} */
+            status: "planned" | "in_progress" | "achieved" | "cancelled";
+            progress: components["schemas"]["GoalProgress"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateSupportGoal: {
+            title: string;
+            description?: string;
+            /** Format: date */
+            targetDate?: string;
+        };
+        GoalProgress: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            goalId: string;
+            authorName: string;
+            body: string;
+            /** @enum {string|null} */
+            progressStatus?: "on_track" | "needs_attention" | "achieved" | null;
+            /** Format: date */
+            observedAt: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        CreateGoalProgress: {
+            body: string;
+            /** @enum {string} */
+            progressStatus?: "on_track" | "needs_attention" | "achieved";
+            /** Format: date */
+            observedAt?: string;
+        };
+        CouncilMeeting: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            studentId: string;
+            studentName: string;
+            /** Format: date-time */
+            scheduledAt: string;
+            /** @enum {string} */
+            status: "planned" | "completed" | "cancelled";
+            subject: string;
+            questions?: string | null;
+            notes?: string | null;
+            decision?: string | null;
+            recommendations?: string | null;
+            participantIds: string[];
+            participantNames: string[];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateCouncilMeeting: {
+            /** Format: date-time */
+            scheduledAt: string;
+            subject: string;
+            questions?: string;
+            notes?: string;
+            participantIds?: string[];
+        };
+        UpdateCouncilMeeting: components["schemas"]["CreateCouncilMeeting"] & {
+            /** @enum {string} */
+            status: "planned" | "completed" | "cancelled";
+            decision: string;
+            recommendations: string;
+        };
+        StudentTask: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            studentId?: string | null;
+            studentName?: string | null;
+            /** Format: uuid */
+            meetingId?: string | null;
+            title: string;
+            description?: string | null;
+            /** Format: uuid */
+            assigneeUserId: string;
+            assigneeName: string;
+            /** Format: date-time */
+            dueAt?: string | null;
+            /** @enum {string} */
+            status: "todo" | "done";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        CreateStudentTask: {
+            title: string;
+            description?: string;
+            /** Format: uuid */
+            assigneeUserId: string;
+            /** Format: date-time */
+            dueAt?: string;
+            /** Format: uuid */
+            meetingId?: string | null;
+        };
+        TimelineEntry: {
+            /** Format: uuid */
+            id: string;
+            action: string;
+            actorName: string;
+            resourceType: string;
+            /** Format: uuid */
+            resourceId?: string | null;
+            title?: string | null;
             /** Format: date-time */
             createdAt: string;
         };
@@ -1381,6 +1832,496 @@ export interface operations {
             };
             403: components["responses"]["Error"];
             415: components["responses"]["Error"];
+        };
+    };
+    getDashboard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tenant-scoped daily workspace */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Dashboard"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    listStudentNotes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Visible student notes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items?: components["schemas"]["StudentNote"][];
+                    };
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    createStudentNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateStudentNote"];
+            };
+        };
+        responses: {
+            /** @description Note created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentNote"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    listStudentSupportCases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Student support cases with goals and progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items?: components["schemas"]["SupportCase"][];
+                    };
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    createStudentSupportCase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSupportCase"];
+            };
+        };
+        responses: {
+            /** @description Support case created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportCase"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    createSupportGoal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSupportGoal"];
+            };
+        };
+        responses: {
+            /** @description Goal created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportGoal"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    updateSupportCaseStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                caseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "active" | "monitoring" | "completed";
+                };
+            };
+        };
+        responses: {
+            /** @description Support case status updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportCase"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    updateSupportGoalStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                goalId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "planned" | "in_progress" | "achieved" | "cancelled";
+                };
+            };
+        };
+        responses: {
+            /** @description Support goal status updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportGoal"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    createGoalProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                goalId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateGoalProgress"];
+            };
+        };
+        responses: {
+            /** @description Progress entry created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalProgress"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    listMeetings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Meetings for visible students */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items?: components["schemas"]["CouncilMeeting"][];
+                    };
+                };
+            };
+        };
+    };
+    listStudentMeetings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Student meetings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items?: components["schemas"]["CouncilMeeting"][];
+                    };
+                };
+            };
+        };
+    };
+    createStudentMeeting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCouncilMeeting"];
+            };
+        };
+        responses: {
+            /** @description Meeting created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouncilMeeting"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    getMeeting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meetingId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tenant-scoped meeting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouncilMeeting"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    updateMeeting: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                meetingId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCouncilMeeting"];
+            };
+        };
+        responses: {
+            /** @description Meeting updated or completed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CouncilMeeting"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    listMyTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tasks assigned to current user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items?: components["schemas"]["StudentTask"][];
+                    };
+                };
+            };
+        };
+    };
+    listStudentTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Student tasks */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items?: components["schemas"]["StudentTask"][];
+                    };
+                };
+            };
+        };
+    };
+    createStudentTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateStudentTask"];
+            };
+        };
+        responses: {
+            /** @description Task created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentTask"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    updateTaskStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                taskId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "todo" | "done";
+                };
+            };
+        };
+        responses: {
+            /** @description Task status updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StudentTask"];
+                };
+            };
+            403: components["responses"]["Error"];
+        };
+    };
+    getStudentTimeline: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: components["parameters"]["StudentID"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unified student activity timeline */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items?: components["schemas"]["TimelineEntry"][];
+                    };
+                };
+            };
+            403: components["responses"]["Error"];
         };
     };
 }

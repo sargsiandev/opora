@@ -34,6 +34,24 @@ func TestAuthorizationRequiresStudentAssignment(t *testing.T) {
 	}
 }
 
+func TestStudentCaseworkWriteRequiresEditGrant(t *testing.T) {
+	actor := actorWith(StudentsUpdate, StudentView)
+	studentID := firstStudent(actor)
+	resource := Resource{OrganizationID: actor.OrganizationID, StudentID: &studentID}
+	if err := (AuthorizationService{}).Can(context.Background(), actor, StudentsUpdate, resource); !errors.Is(err, ErrPermissionDenied) {
+		t.Fatalf("Can() error = %v, want permission denied", err)
+	}
+}
+
+func TestStudentCaseworkWriteAllowsEditGrant(t *testing.T) {
+	actor := actorWith(StudentsUpdate, StudentEdit)
+	studentID := firstStudent(actor)
+	resource := Resource{OrganizationID: actor.OrganizationID, StudentID: &studentID}
+	if err := (AuthorizationService{}).Can(context.Background(), actor, StudentsUpdate, resource); err != nil {
+		t.Fatalf("Can() error = %v, want nil", err)
+	}
+}
+
 func TestAuthorizationAllowsAdditiveStudentGrant(t *testing.T) {
 	actor := actorWith(DocumentsDownload, StudentDownload)
 	studentID := firstStudent(actor)

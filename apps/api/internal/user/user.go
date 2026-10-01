@@ -25,10 +25,11 @@ var (
 )
 
 type Role struct {
-	ID       uuid.UUID `json:"id"`
-	Key      string    `json:"key"`
-	Name     string    `json:"name"`
-	IsSystem bool      `json:"isSystem"`
+	ID          uuid.UUID `json:"id"`
+	Key         string    `json:"key"`
+	Name        string    `json:"name"`
+	IsSystem    bool      `json:"isSystem"`
+	Permissions []string  `json:"permissions"`
 }
 
 type User struct {
@@ -62,9 +63,10 @@ type Repository struct{ pool *pgxpool.Pool }
 func NewRepository(pool *pgxpool.Pool) *Repository { return &Repository{pool: pool} }
 
 func (r *Repository) Roles(ctx context.Context, organizationID uuid.UUID) ([]Role, error) {
-	rows, err := r.pool.Query(ctx, `SELECT id,role_key,name,is_system FROM roles
-		WHERE organization_id=$1 ORDER BY CASE role_key WHEN 'organization_admin' THEN 0 WHEN 'psychologist' THEN 1
-		WHEN 'specialist' THEN 2 WHEN 'viewer' THEN 3 ELSE 4 END,name`, organizationID)
+	rows, err := r.pool.Query(ctx, `SELECT r.id,r.role_key,r.name,r.is_system,COALESCE(array_agg(rp.permission_code ORDER BY rp.permission_code) FILTER (WHERE rp.permission_code IS NOT NULL),'{}')
+		FROM roles r LEFT JOIN role_permissions rp ON rp.role_id=r.id WHERE r.organization_id=$1 GROUP BY r.id
+		ORDER BY CASE r.role_key WHEN 'organization_admin' THEN 0 WHEN 'psychologist' THEN 1
+		WHEN 'specialist' THEN 2 WHEN 'viewer' THEN 3 ELSE 4 END,r.name`, organizationID)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +74,7 @@ func (r *Repository) Roles(ctx context.Context, organizationID uuid.UUID) ([]Rol
 	result := make([]Role, 0)
 	for rows.Next() {
 		var role Role
-		if err := rows.Scan(&role.ID, &role.Key, &role.Name, &role.IsSystem); err != nil {
+		if err := rows.Scan(&role.ID, &role.Key, &role.Name, &role.IsSystem, &role.Permissions); err != nil {
 			return nil, err
 		}
 		result = append(result, role)

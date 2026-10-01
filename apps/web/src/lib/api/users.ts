@@ -5,6 +5,7 @@ export type OrganizationRole = {
   key: string;
   name: string;
   isSystem: boolean;
+  permissions: string[];
 };
 
 export type OrganizationUser = {

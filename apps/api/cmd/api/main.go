@@ -12,6 +12,7 @@ import (
 
 	"opora.local/api/internal/audit"
 	"opora.local/api/internal/auth"
+	"opora.local/api/internal/casework"
 	"opora.local/api/internal/config"
 	"opora.local/api/internal/devbootstrap"
 	"opora.local/api/internal/document"
@@ -80,9 +81,10 @@ func main() {
 	documentService := document.NewService(documentRepository, storage, document.NewClamAVScanner(cfg.ClamAV.Address), studentRepository, cfg.Upload.MaxBytes)
 	onlyOfficeService := document.NewOnlyOfficeService(documentService, authRepository, cfg.OnlyOffice, cfg.Upload.MaxBytes)
 	documentHandler := document.NewHandler(documentService, onlyOfficeService, cfg.Upload.MaxBytes, logger)
+	caseworkHandler := casework.NewHandler(casework.NewService(casework.NewRepository(pool), studentRepository))
 	server := httpserver.New(cfg.HTTP, logger, pool, httpserver.Application{
 		Auth: authHandler, Students: studentHandler, Documents: documentHandler, Users: userHandler,
-		Access: accessHandler, Audit: auditHandler, Organization: organizationHandler, WebOrigin: cfg.Auth.AllowedOrigin,
+		Access: accessHandler, Audit: auditHandler, Organization: organizationHandler, Casework: caseworkHandler, WebOrigin: cfg.Auth.AllowedOrigin,
 	})
 	serverErrors := make(chan error, 1)
 	go func() {
